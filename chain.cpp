@@ -25,7 +25,44 @@ Chain::~Chain() {
  * @param ndata = The data to be inserted.
  */
 Chain::Node * Chain::insertAfter(Node * p, const Block &ndata) {
-  /* your code here */
+
+  // allocate new node 
+  Node *newNode = new Node(ndata);
+
+  // The chain is empty
+  if(head_ == NULL) {
+    head_ = newNode;
+    length_++;
+    return newNode;
+  }
+
+  // If p is NULL, inserts a new head node to the chain.
+  if (p == NULL) {
+    newNode->next = head_;
+    // set prev of head to newNode
+    if(head_ != NULL) {
+      head_->prev = newNode;
+    }
+    head_ = newNode;
+    length_++;
+    return newNode;
+
+  } else {
+    // set next of new node to next of prev node
+    newNode->next = p->next;
+    // set next of prev node to new node
+    p->next = newNode;
+    // now set prev of new node to  prev node
+    newNode->prev = p;
+    // set prev of new node's next node to newNode
+    if(newNode->next != NULL) {
+      newNode->next->prev = newNode;
+    }
+  }
+
+  //increase length_
+  length_++;
+  return newNode;
 }
 
 /**
@@ -35,15 +72,89 @@ Chain::Node * Chain::insertAfter(Node * p, const Block &ndata) {
  * Change the chain's head pointer if necessary.
  */
 void Chain::swap(Node *p, Node *q) {
-  /* your code here */
-}
+  // If p or q is NULL or p==q, do nothing.
+  if(p==q || p==NULL || q==NULL) {
+    return;
+  }
+  // p and q are right next to each other (p on left, q on right)
+  if (p->next == q) { 
+    
+      p->next = q->next;
+      q->prev = p->prev;
 
+      if (p->next != NULL) {
+        p->next->prev = p;
+      }
+
+      if (q->prev != NULL) {
+        q->prev->next = q;
+      }
+
+      q->next = p;
+      p->prev = q;
+  // p and q are right next to each other (q on left, p on right)
+  } else if(q->next == p){
+    
+      q->next = p->next;
+      p->prev = q->prev;
+
+      if (q->next != NULL) {
+        q->next->prev = q;
+      }
+
+      if (p->prev != NULL) {
+        p->prev->next = p;
+      }
+
+      p->next = q;
+      q->prev = p;
+
+  } else {
+
+      Node *prevTemp = q->prev;
+      Node *nextTemp = q->next;
+
+      q->prev = p->prev;
+      q->next = p->next;
+
+      p->prev = prevTemp;
+      p->next = nextTemp;
+
+      if (q->next != NULL) {
+        q->next->prev = q;
+      }
+
+      if (q->prev != NULL) {
+        q->prev->next = q;
+      }
+
+      if (p->next != NULL) {
+        p->next->prev = p;
+      }
+
+      if (p->prev != NULL) {
+        p->prev->next = p; 
+      }
+ 
+  }
+}
 /**
  * Destroys all dynamically allocated memory associated with the
  * current Chain class.
  */
 void Chain::clear() {
-  /* your code here */
+
+  // while current node is not null, store next node in temp, free memory in current node,
+  // and assign as next node.
+  Node *p = head_;
+
+  while(p != NULL) {
+    Node *temp = p->next;
+    delete p;
+    p = temp;
+  }
+  // derefernce head
+  head_ = NULL;
 }
 
 /**
